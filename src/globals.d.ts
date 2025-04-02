@@ -1,7 +1,6 @@
-import { Logger } from '@src/logger';
+import { Logger } from "@src/logger";
 
 declare global {
-  interface Window {
-    Log: Logger;
-  }
+  var Log: Logger;
+  var Logger: Logger;
 }

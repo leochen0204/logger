@@ -1,39 +1,84 @@
-export class Logger {
-    private tag: string;
-  
-    constructor(tag: string) {
-      this.tag = tag;
-    }
-  
-    private getTimestamp(): string {
-      return new Date().toISOString().replace('T', ' ').split('.')[0];
-    }
-  
-    v(message: string, ...args: any[]) {
-      console.log(`%c[V] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: gray;', ...args);
-    }
-  
-    d(message: string, ...args: any[]) {
-      console.log(`%c[D] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: blue;', ...args);
-    }
-  
-    i(message: string, ...args: any[]) {
-      console.log(`%c[I] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: green;', ...args);
-    }
-  
-    w(message: string, ...args: any[]) {
-      console.warn(`%c[W] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: orange;', ...args);
-    }
-  
-    e(message: string, ...args: any[]) {
-      console.error(`%c[E] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: red;', ...args);
-    }
-  
-    wtf(message: string, ...args: any[]) {
-      console.error(`%c[WTF] ${this.getTimestamp()} ${this.tag}: ${message}`, 'background: black; color: white; font-weight: bold;', ...args);
+export default class Logger {
+  private tag: string;
+
+  private static LEVELS: Record<
+    "v" | "d" | "i" | "w" | "e" | "wtf",
+    { level: "log" | "warn" | "error"; color: string }
+  > = {
+    v: { level: "log", color: "gray" },
+    d: { level: "log", color: "blue" },
+    i: { level: "log", color: "green" },
+    w: { level: "warn", color: "orange" },
+    e: { level: "error", color: "red" },
+    wtf: {
+      level: "error",
+      color: "black; background: white; font-weight: bold",
+    },
+  };
+
+  constructor(tag: string) {
+    this.tag = tag;
+  }
+
+  private getTimestamp(): string {
+    const now = new Date();
+    return now.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+  }
+
+  private getCaller(): string {
+    const error = new Error();
+    const stack = error.stack?.split("\n") || [];
+    const callerLine = stack[4]?.trim();
+    return callerLine || "Unknown caller";
+  }
+
+  private log(
+    levelKey: keyof typeof Logger.LEVELS,
+    message: string,
+    ...args: any[]
+  ) {
+    const { level, color } = Logger.LEVELS[levelKey];
+
+    if (typeof console[level] === "function") {
+      const caller = this.getCaller();
+      console[level](
+        `%c[${levelKey.toUpperCase()}] ${this.getTimestamp()} ${
+          this.tag
+        }: ${message}`,
+        `color: ${color};`,
+        ...args,
+        `${caller}`
+      );
+    } else {
+      console.error(`Invalid log level: ${level}`);
     }
   }
-  
 
-  window.Log = new Logger("DEV");
-  
+  v(message: string, ...args: any[]) {
+    this.log("v", message, ...args);
+  }
+
+  d(message: string, ...args: any[]) {
+    this.log("d", message, ...args);
+  }
+
+  i(message: string, ...args: any[]) {
+    this.log("i", message, ...args);
+  }
+
+  w(message: string, ...args: any[]) {
+    this.log("w", message, ...args);
+  }
+
+  e(message: string, ...args: any[]) {
+    this.log("e", message, ...args);
+  }
+
+  wtf(message: string, ...args: any[]) {
+    this.log("wtf", message, ...args);
+  }
+}
+
+const TAG = "DEV";
+
+globalThis.Log = new Logger(TAG);

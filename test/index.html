@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../dist/logger.umd.js"></script>
+  </head>
+  <body>
+    <script>
+      const logger = new Logger("test");
+      logger.v("Hello, world!");
+      logger.d("This is an debug message.");
+      logger.i("This is a info message.");
+      logger.w("This is a warning message.");
+      logger.e("This is an error message.");
+      logger.wtf("This is an wtf message.");
+    </script>
+  </body>
+</html>

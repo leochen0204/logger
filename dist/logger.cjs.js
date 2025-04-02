@@ -5,28 +5,58 @@ class Logger {
         this.tag = tag;
     }
     getTimestamp() {
-        return new Date().toISOString().replace('T', ' ').split('.')[0];
+        const now = new Date();
+        return now.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+    }
+    getCaller() {
+        var _a, _b;
+        const error = new Error();
+        const stack = ((_a = error.stack) === null || _a === void 0 ? void 0 : _a.split("\n")) || [];
+        const callerLine = (_b = stack[4]) === null || _b === void 0 ? void 0 : _b.trim();
+        return callerLine || "Unknown caller";
+    }
+    log(levelKey, message, ...args) {
+        const { level, color } = Logger.LEVELS[levelKey];
+        if (typeof console[level] === "function") {
+            const caller = this.getCaller();
+            console[level](`%c[${levelKey.toUpperCase()}] ${this.getTimestamp()} ${this.tag}: ${message}`, `color: ${color};`, ...args, `${caller}`);
+        }
+        else {
+            console.error(`Invalid log level: ${level}`);
+        }
     }
     v(message, ...args) {
-        console.log(`%c[V] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: gray;', ...args);
+        this.log("v", message, ...args);
     }
     d(message, ...args) {
-        console.log(`%c[D] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: blue;', ...args);
+        this.log("d", message, ...args);
     }
     i(message, ...args) {
-        console.log(`%c[I] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: green;', ...args);
+        this.log("i", message, ...args);
     }
     w(message, ...args) {
-        console.warn(`%c[W] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: orange;', ...args);
+        this.log("w", message, ...args);
     }
     e(message, ...args) {
-        console.error(`%c[E] ${this.getTimestamp()} ${this.tag}: ${message}`, 'color: red;', ...args);
+        this.log("e", message, ...args);
     }
     wtf(message, ...args) {
-        console.error(`%c[WTF] ${this.getTimestamp()} ${this.tag}: ${message}`, 'background: black; color: white; font-weight: bold;', ...args);
+        this.log("wtf", message, ...args);
     }
 }
-window.Log = new Logger("DEV");
+Logger.LEVELS = {
+    v: { level: "log", color: "gray" },
+    d: { level: "log", color: "blue" },
+    i: { level: "log", color: "green" },
+    w: { level: "warn", color: "orange" },
+    e: { level: "error", color: "red" },
+    wtf: {
+        level: "error",
+        color: "black; background: white; font-weight: bold",
+    },
+};
+const TAG = "DEV";
+globalThis.Log = new Logger(TAG);
 
-exports.Logger = Logger;
+module.exports = Logger;
 //# sourceMappingURL=logger.cjs.js.map

@@ -1,7 +1,10 @@
-export declare class Logger {
+export default class Logger {
     private tag;
+    private static LEVELS;
     constructor(tag: string);
     private getTimestamp;
+    private getCaller;
+    private log;
     v(message: string, ...args: any[]): void;
     d(message: string, ...args: any[]): void;
     i(message: string, ...args: any[]): void;

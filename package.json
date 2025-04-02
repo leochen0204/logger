@@ -2,7 +2,7 @@
   "name": "logger",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/logger.umd.js",
   "scripts": {
     "build": "rollup -c"
   },
